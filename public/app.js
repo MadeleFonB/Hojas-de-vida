@@ -1,4 +1,4 @@
-const apiUrl = 'http://localhost:3000/api/hojas';
+const API_AUTH_URL = 'https://hojas-de-vida.onrender.com/api/auth/login';
 
 const listaHojas = document.getElementById('listaHojas');
 const formHoja = document.getElementById('formHoja');
