@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Gestor de Hojas de Vida</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 800px; margin: auto; }
+    input, select, button, textarea { margin: 5px 0; padding: 8px; width: 100%; }
+    label { font-weight: bold; }
+    .hoja { border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; }
+    .hoja button { margin-right: 10px; }
+    #loginSection { margin-top: 40px; border-top: 1px solid #ccc; padding-top: 20px; }
+    #appSection { display: none; }
+  </style>
+</head>
+<body>
+  <h1>Gestor de Hojas de Vida</h1>
+
+  <!-- Sección completa que solo aparece con login -->
+  <div id="appSection">
+    <!-- Filtros -->
+    <section>
+      <h2>Filtrar hojas de vida</h2>
+      <label for="filterPerfil">Perfil profesional:</label>
+      <input type="text" id="filterPerfil" placeholder="Ej. Desarrollador Backend" />
+
+      <label for="filterHabilidad">Habilidad:</label>
+      <input type="text" id="filterHabilidad" placeholder="Ej. Node.js" />
+
+      <button id="btnFiltrar">Filtrar</button>
+      <button id="btnLimpiarFiltros">Limpiar filtros</button>
+    </section>
+
+    <!-- Lista -->
+    <section>
+      <h2>Lista de hojas de vida</h2>
+      <div id="listaHojas"></div>
+    </section>
+
+    <!-- Formulario -->
+    <section>
+      <h2>Crear / Actualizar hoja de vida</h2>
+      <form id="formHoja">
+        <input type="hidden" id="hojaId" />
+
+        <label for="nombre">Nombre:</label>
+        <input type="text" id="nombre" required />
+
+        <label for="correo">Correo:</label>
+        <input type="email" id="correo" required />
+
+        <label for="telefono">Teléfono:</label>
+        <input type="text" id="telefono" required />
+
+        <label for="perfilProfesional">Perfil profesional:</label>
+        <input type="text" id="perfilProfesional" />
+
+        <label for="habilidades">Habilidades (separadas por coma):</label>
+        <input type="text" id="habilidades" placeholder="Node.js, React, SQL" />
+
+        <label for="experiencia">Experiencia:</label>
+        <textarea id="experiencia"></textarea>
+
+        <label for="educacion">Educación:</label>
+        <textarea id="educacion"></textarea>
+
+        <button type="submit" id="btnGuardar">Guardar</button>
+        <button type="button" id="btnCancelar">Cancelar</button>
+      </form>
+    </section>
+  </div>
+
+  <!-- Login -->
+  <section id="loginSection">
+    <h2>Iniciar sesión</h2>
+    <form id="formLogin">
+      <label for="loginCorreo">Correo:</label>
+      <input type="email" id="loginCorreo" required />
+
+      <label for="loginPassword">Contraseña:</label>
+      <input type="password" id="loginPassword" required />
+
+      <button type="submit">Login</button>
+      <button type="button" id="btnLogout" style="display: none;">Cerrar sesión</button>
+    </form>
+  </section>
+
+  <script src="app.js"></script>
+  <script>
+    // Mostrar/Ocultar secciones según estado de login
+    function actualizarEstadoUI() {
+      const token = localStorage.getItem('token');
+      const estaLogueado = !!token;
+
+      document.getElementById('appSection').style.display = estaLogueado ? 'block' : 'none';
+      document.getElementById('btnLogout').style.display = estaLogueado ? 'inline-block' : 'none';
+    }
+
+    document.getElementById('formLogin').onsubmit = async (e) => {
+      e.preventDefault();
+      const correo = document.getElementById('loginCorreo').value;
+      const password = document.getElementById('loginPassword').value;
+      await login(correo, password);
+      actualizarEstadoUI();
+      cargarHojas();
+    };
+
+    document.getElementById('btnLogout').onclick = () => {
+      logout();
+      actualizarEstadoUI();
+    };
+
+    // Ejecutar al cargar la página
+    actualizarEstadoUI();
+    if (localStorage.getItem('token')) {
+      cargarHojas();
+    }
+  </script>
+</body>
+</html>
