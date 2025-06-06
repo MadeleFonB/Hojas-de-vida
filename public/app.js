@@ -1,25 +1,25 @@
-//const apiUrl = 'http://localhost:3000/api/hojas';
-const API_AUTH_URL = 'https://hojas-de-vida.onrender.com/api/auth/login';
+// ======================== CONSTANTES ============================
+const API_BASE_URL = 'https://hojas-de-vida.onrender.com/api';
+const API_HOJAS_URL = `${API_BASE_URL}/hojas`;
+const API_AUTH_URL = `${API_BASE_URL}/auth/login`;
 
-
+// ======================== ELEMENTOS ============================
 const listaHojas = document.getElementById('listaHojas');
 const formHoja = document.getElementById('formHoja');
 const hojaId = document.getElementById('hojaId');
 
-// Filtros
 const filterPerfil = document.getElementById('filterPerfil');
 const filterHabilidad = document.getElementById('filterHabilidad');
 const btnFiltrar = document.getElementById('btnFiltrar');
 const btnLimpiarFiltros = document.getElementById('btnLimpiarFiltros');
 
-// Botones del formulario
 const btnCancelar = document.getElementById('btnCancelar');
 
 // ======================== FUNCIONES PRINCIPALES ============================
 
-// Cargar hojas de vida (con filtros opcionales)
+// Cargar hojas de vida
 async function cargarHojas() {
-  let url = API_AUTH_URL;
+  let url = API_HOJAS_URL;
   const perfil = filterPerfil.value.trim();
   const habilidad = filterHabilidad.value.trim();
 
@@ -53,7 +53,7 @@ async function cargarHojas() {
   }
 }
 
-// Mostrar hojas de vida en pantalla
+// Mostrar hojas de vida
 function mostrarHojas(hojas) {
   listaHojas.innerHTML = '';
   if (hojas.length === 0) {
@@ -89,13 +89,12 @@ function mostrarHojas(hojas) {
 
 // ===================== CRUD: Editar, Eliminar, Guardar =======================
 
-// Cargar hoja de vida en el formulario para edición
 async function editarHoja(id) {
   const token = localStorage.getItem('token');
   const headers = {};
   if (token) headers['Authorization'] = `Bearer ${token}`;
 
-  const res = await fetch(`${API_AUTH_URL}/${id}`, { headers });
+  const res = await fetch(`${API_HOJAS_URL}/${id}`, { headers });
   if (!res.ok) {
     alert('No se encontró la hoja de vida');
     return;
@@ -113,7 +112,6 @@ async function editarHoja(id) {
   formHoja.educacion.value = hoja.educacion;
 }
 
-// Eliminar hoja de vida
 async function eliminarHoja(id) {
   if (!confirm('¿Estás seguro de eliminar esta hoja de vida?')) return;
 
@@ -121,7 +119,7 @@ async function eliminarHoja(id) {
   const headers = {};
   if (token) headers['Authorization'] = `Bearer ${token}`;
 
-  const res = await fetch(`${API_AUTH_URL}/${id}`, { method: 'DELETE', headers });
+  const res = await fetch(`${API_HOJAS_URL}/${id}`, { method: 'DELETE', headers });
   if (res.ok) {
     alert('Hoja eliminada');
     cargarHojas();
@@ -130,7 +128,6 @@ async function eliminarHoja(id) {
   }
 }
 
-// Guardar hoja (crear o actualizar)
 formHoja.onsubmit = async (e) => {
   e.preventDefault();
 
@@ -153,15 +150,13 @@ formHoja.onsubmit = async (e) => {
   try {
     let res;
     if (hojaId.value) {
-      // Actualizar
-      res = await fetch(`${API_AUTH_URL}/${hojaId.value}`, {
+      res = await fetch(`${API_HOJAS_URL}/${hojaId.value}`, {
         method: 'PUT',
         headers,
         body: JSON.stringify(data),
       });
     } else {
-      // Crear
-      res = await fetch(API_AUTH_URL, {
+      res = await fetch(API_HOJAS_URL, {
         method: 'POST',
         headers,
         body: JSON.stringify(data),
@@ -186,7 +181,7 @@ formHoja.onsubmit = async (e) => {
 
 async function login(correo, password) {
   try {
-    const response = await fetch('http://localhost:3000/api/auth/login', {
+    const response = await fetch(API_AUTH_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ correo, password })
@@ -219,13 +214,11 @@ function logout() {
 
 // ========================= EVENTOS ==============================
 
-// Cancelar edición
 btnCancelar.onclick = () => {
   hojaId.value = '';
   formHoja.reset();
 };
 
-// Filtros
 btnFiltrar.onclick = () => cargarHojas();
 btnLimpiarFiltros.onclick = () => {
   filterPerfil.value = '';
@@ -233,13 +226,12 @@ btnLimpiarFiltros.onclick = () => {
   cargarHojas();
 };
 
-// Mostrar/ocultar secciones según autenticación
 function verificarAutenticacion() {
   const token = localStorage.getItem('token');
   const seccionesProtegidas = [
     formHoja.parentElement,
     listaHojas.parentElement,
-    document.querySelector('section h2 + label')?.parentElement // filtros
+    document.querySelector('section h2 + label')?.parentElement
   ];
 
   if (token) {
@@ -257,10 +249,8 @@ function verificarAutenticacion() {
   }
 }
 
-// Asociar evento al botón logout
 document.getElementById('btnLogout')?.addEventListener('click', logout);
 
-// Ejecutar al cargar la página
 window.onload = () => {
   verificarAutenticacion();
   cargarHojas();
