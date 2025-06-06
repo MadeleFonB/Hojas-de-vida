@@ -19,7 +19,7 @@ const btnCancelar = document.getElementById('btnCancelar');
 
 // Cargar hojas de vida (con filtros opcionales)
 async function cargarHojas() {
-  let url = apiUrl;
+  let url = API_AUTH_URL;
   const perfil = filterPerfil.value.trim();
   const habilidad = filterHabilidad.value.trim();
 
@@ -95,7 +95,7 @@ async function editarHoja(id) {
   const headers = {};
   if (token) headers['Authorization'] = `Bearer ${token}`;
 
-  const res = await fetch(`${apiUrl}/${id}`, { headers });
+  const res = await fetch(`${API_AUTH_URL}/${id}`, { headers });
   if (!res.ok) {
     alert('No se encontró la hoja de vida');
     return;
@@ -121,7 +121,7 @@ async function eliminarHoja(id) {
   const headers = {};
   if (token) headers['Authorization'] = `Bearer ${token}`;
 
-  const res = await fetch(`${apiUrl}/${id}`, { method: 'DELETE', headers });
+  const res = await fetch(`${API_AUTH_URL}/${id}`, { method: 'DELETE', headers });
   if (res.ok) {
     alert('Hoja eliminada');
     cargarHojas();
@@ -154,14 +154,14 @@ formHoja.onsubmit = async (e) => {
     let res;
     if (hojaId.value) {
       // Actualizar
-      res = await fetch(`${apiUrl}/${hojaId.value}`, {
+      res = await fetch(`${API_AUTH_URL}/${hojaId.value}`, {
         method: 'PUT',
         headers,
         body: JSON.stringify(data),
       });
     } else {
       // Crear
-      res = await fetch(apiUrl, {
+      res = await fetch(API_AUTH_URL, {
         method: 'POST',
         headers,
         body: JSON.stringify(data),
